@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+{% block main %}
+    <ul class="list-group list-group-flush">
+        {% for novel in novels%}
+            <li class="list-group-item">
+                <img src="https://picsum.photos/200">
+                <a href="/novel/{{novel.novel_name_id}}">
+                    <p>{{ novel.name}}</p>
+                </a>
+            </li>
+        {% endfor%}
+    </ul>
+{% endblock %}

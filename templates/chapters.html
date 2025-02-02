@@ -1,0 +1,29 @@
+{% extends "layout.html"%}
+
+{% block title%}
+    {{novel}} {{chapter_num}}
+{% endblock%}
+
+{% block main %}
+
+    <h1>{{novel}} {{chapter_num}}</h1>
+    
+    {% if previous%}
+    <button class="btn btn-light"><a href="/chapter/{{novel_name}}-{{novel_id}}-{{previous[0].chapter_id}}-{{previous_num}}">previous</a></button>
+    {% endif%}
+    <button class="btn btn-light"><a href="/novel/{{novel_name}}-{{novel_id}}">Chapter List</a></button>
+    {% if next%}
+    <button class="btn btn-light"><a href="/chapter/{{novel_name}}-{{novel_id}}-{{next[0].chapter_id}}-{{next_num}}">Next</a></button>
+    {% endif%}
+    
+    {{ content | safe}}
+    
+    {% if previous%}
+    <button class="btn btn-light"><a href="/chapter/{{novel_name}}-{{novel_id}}-{{previous[0].chapter_id}}-{{previous_num}}">previous</a></button>
+    {% endif%}
+    <button class="btn btn-light"><a href="/novel/{{novel_name}}-{{novel_id}}">Chapter List</a></button>
+    {% if next%}
+    <button class="btn btn-light"><a href="chapter/{{novel_name}}-{{novel_id}}-{{next[0].chapter_id}}-{{next_num}}">Next</a></button>
+    {% endif%}
+
+{% endblock %}
