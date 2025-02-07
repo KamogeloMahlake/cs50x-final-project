@@ -1,0 +1,52 @@
+{% extends "layout.html"%}
+
+{% block title %}
+    {{session["username"]}}
+{% endblock %}
+
+{% block main %}
+    <div>
+      <a href="/create">
+        <button class="btn">Create New Novel</button>
+      </a>
+    </div>
+
+    <div id="user-details">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+                <p>Name</p>
+                <p>{{user.username}}</p>
+            </li>
+            <li class="list-group-item">
+                <p>Place of residence</p>
+                <p>UNKNOWN</p>
+            </li>
+            <li class="list-group-item">
+                <p>Registered</p>
+		<p>{{user.date}}</p>
+            </li>
+        </ul>
+
+        <ul  class="list-group list-group-flush">
+            
+            <li class="list-group-item">
+                <p>Comments</p>
+                <p><a href="">Last comments</a></p>
+            </li>
+            
+            <li class="list-group-item">
+                <p>Novels</p>
+            </li>
+        
+        </ul>
+    </div>
+    <button class="novels-button">All novels</button>
+    <div class="hidden" id="novels">
+    </div>
+
+{% endblock %}
+
+{% block script %}
+	<script src="/static/profile.js">
+	</script>
+{% endblock %}

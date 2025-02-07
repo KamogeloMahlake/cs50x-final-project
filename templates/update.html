@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block title%}
+  Update: {{novel.name}}
+{% endblock %}
+
+{% block main %}
+
+<a href="/delete/{{novel.name}}/0"><button class="btn btn-primary">DELETE NOVEL</button></a>
+  <form action="/profile/{{novel.name}}/update" method="post">
+  <label for="novel-name">Novel name: </label>
+    <input name="new_name" id="novel-name" type="text" value="{{novel.name}}" />
+    <button type="submit">Submit</button>
+  </form>
+  <h2>Chapters</h2>
+  {% for chapter in chapters%}
+    <div>
+      <a href="/{{novel.name}}/chapter-{{chapter.chapter_num}}">{{chapter.title}}</a>
+      <a href="/profile/{{novel.name}}/update/chapter-{{chapter.chapter_num}}"><button>UPDATE</button></a>
+    </div>
+  {% endfor %}
+{% endblock %}

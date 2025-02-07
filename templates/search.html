@@ -9,13 +9,11 @@ Search
         <ul>
             {% for novel in novels %}
                 <li>
-                    <a href="/novel/{{novel.novel_name}}-{{novel.novel_id}}">
-                        {{novel.name}}
-                    </a>
+			                <a href="/novel/{{novel.name}}">
+                        	{{novel.name}}
+                    	</a>
                 </li>    
             {% endfor %}
-        </ul>
-    {% else %}
-        <p>{{message}}</p>
+	      </ul>
     {% endif %}
 {% endblock %}

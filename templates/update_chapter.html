@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Update Chapter
+{% endblock %}
+
+{% block main%}
+  <a href="/delete/{{name}}/{{chapter.chapter_num}}"><button class="btn btn-primary">DELETE</button>
+  <form action="/profile/{{name}}/update/chapter-{{chapter.chapter_num}}" method="post">
+    <div><input name="title" type="text" value="{{chapter.title}}" /></div>
+    <div><input name="chapter_num" type="text" value="{{chapter.chapter_num}}"/></div>
+    <div><input name="content" type="text" value="{{chapter.content}}" /></div>
+    <button class="btn btn-primary" type="submit">UPDATE</button>
+  </form>     
+{% endblock%}

@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block title %}
+	{{ name }}
+{% endblock %}
+
+{% block main %}
+    <h1>{{ name }}</h1>
+    
+    {% for chapter in chapters%}
+    	<p>
+		<a href="/{{name}}/chapter-{{chapter.chapter_num}}">
+			 {{chapter.title}}
+		</a>
+	</p>
+    {% endfor%}
+
+{% endblock %}
