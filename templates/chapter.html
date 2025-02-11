@@ -8,25 +8,66 @@
 
 {% block main %}
 
-    <h1>{{name}}</h1>
-    <h2>{{chapter.title}}</h2>
+    <h1 class="text-center">{{name}}</h1>
+    <h2 class="text-center">{{chapter.title}}</h2>
+    <div class="d-flex flex-column justify-content-center ">
+      <div class="center">
+      {% if previous%}
+       <a href="/{{name}}/chapter-{{previous[0].chapter_num}}"><button class="btn btn-primary"><<<<<<</button></a>
+      {% endif%}
+        <a href="/novel/{{name}}"><button class="btn btn-primary">Chapter List</button></a>
+      {% if next_chapter%}
+      <a href="/{{name}}/chapter-{{next_chapter[0].chapter_num}}"><button class="btn btn-primary">>>>>>></button></a>
+      {% endif%}
+      </div>
     
-    {% if previous%}
-    <button class="btn btn-light"><a href="/{{name}}/chapter-{{previous[0].chapter_num}}">previous</a></button>
-    {% endif%}
-    <button class="btn btn-light"><a href="/novel/{{name}}">Chapter List</a></button>
-    {% if next_chapter%}
-    <button class="btn btn-light"><a href="/{{name}}/chapter-{{next_chapter[0].chapter_num}}">Next</a></button>
-    {% endif%}
-    
-    {{ chapter.content | safe}}
-    
-    {% if previous%}
-    <button class="btn btn-light"><a href="/{{name}}/chapter-{{previous[0].chapter_num}}">previous</a></button>
-    {% endif%}
-    <button class="btn btn-light"><a href="/novel/{{name}}">Chapter List</a></button>
-    {% if next_chapter%}
-    <button class="btn btn-light"><a href="/{{name}}/chapter-{{next_chapter[0].chapter_num}}">Next</a></button>
-    {% endif%}
+      <div class="center">{{ chapter.content | safe}}</div>
+      <div class="center">
+      {% if previous%}
+      <a href="/{{name}}/chapter-{{previous[0].chapter_num}}"><button class="btn btn-primary"><<<<<<</button></a>
+      {% endif%}
+      <a href="/novel/{{name}}"><button class=" btn btn-primary">Chapter List</button></a>
+      {% if next_chapter%}
+      <a href="/{{name}}/chapter-{{next_chapter[0].chapter_num}}"><button class="btn btn-primary">>>>>>></button></a>
+      {% endif%}
 
+      </div>
+    </div>
+    
+    <div class="center">
+      <form action="/comments" method="post">
+        <div><textarea name="comment" placeholder="comment" class="form-control"/></textarea></div>
+        <div><input hidden name="type" value="chapter"></div>
+        <div><input hidden name="link" value="/{{name}}/chapter-{{chapter.chapter_num}}" /></div>
+        <div><input hidden name="id" id="id" value="{{chapter.chapter_id}}" /></div>
+        <button class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+
+    <div id="comments">
+    </div>
+          
 {% endblock %}
+{% block script%}
+  <script>
+    const comments = document.getElementById("comments");
+    const chapterId = document.getElementById("id");
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      let reponse = await fetch(`/comments?chapter=${chapterId.value}`);
+      let data = await reponse.json();
+      let html = ``;
+      
+      if (!data)
+      {
+        comments.textContent = "NO COMMENTS";
+        return
+      }
+      data.forEach(comment => {
+        html += `<p>${comment.comment}</p>`
+      })
+      comments.innerHTML = html;
+
+    })
+  </script>
+{% endblock%}

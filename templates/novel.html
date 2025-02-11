@@ -1,18 +1,75 @@
 {% extends "layout.html" %}
 
 {% block title %}
-	{{ name }}
+	{{ novel.name }}
 {% endblock %}
 
 {% block main %}
-    <h1>{{ name }}</h1>
-    
+<div class="container text-center">
+  <h1>{{novel.name}}</h1>
+  <div class="row">
+    <img src="{{novel.image}}" style="margin: 0 auto" class="col-sm-12 col-md-6 img-responsive item-img lazy"/>
+    <div class="col-sm-12 col-md-6">
+      <div>
+        <h3>About</h3>
+        <hr>
+        <div>{{novel.about | safe}}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<button class="btn" id="button">Comment</button>
+<hr>
+<div id="chapters">
     {% for chapter in chapters%}
     	<p>
-		<a href="/{{name}}/chapter-{{chapter.chapter_num}}">
-			 {{chapter.title}}
-		</a>
-	</p>
+		    <a href="/{{novel.name}}/chapter-{{chapter.chapter_num}}">
+			   {{chapter.title}}
+		    </a>
+	    </p>
     {% endfor%}
+</div>
+<div id="comments" class="hidden">
+  <form action="/comments" method="post"/>
+    <div class="mb-3"><textarea name="comment" class="form-control" type="textarea" autocomplete="off" placeholder="comment"></textarea></div>
+    <div><input name="type" hidden value="novel" /></div>
+    <div><input name="link" hidden value="/novel/{{novel.name}}" /></div>
+    <div><input name="id" id="id" hidden value="{{novel.novel_id}}" /></div>
+    <button class="btn btn-primary">Submit</button>
+  </form>
+  <button id="show" class="btn">Show comments</button>
+  <ul id="displaycomments" class="hidden">
+  </ul>
+</div>
+{% endblock %}
 
+{% block script %}
+  <script>
+    const chapters = document.getElementById("chapters");
+    const comments = document.getElementById("comments");
+    const button = document.getElementById("button");
+    const displayComments = document.getElementById("displaycomments");
+    const show = document.getElementById("show");
+    const novelId = document.getElementById("id");
+
+    button.addEventListener("click", () => {
+      chapters.classList.toggle("hidden");
+      comments.classList.toggle("hidden");
+    });
+
+    show.addEventListener("click", async () => {
+      let response = await fetch(`/comments?novel=${novelId.value}`);
+      let data = await response.json();
+
+      let html = `` 
+      data.forEach(comment => {
+        html += `<li>${comment.comment}</li>`
+      });
+      displayComments.innerHTML = html;
+      displayComments.classList.toggle("hidden");
+      show.textContent = show.textContent === "Show comments" ? "Close comments" : "Show comments";
+    })
+  </script>
 {% endblock %}

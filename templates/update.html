@@ -5,13 +5,13 @@
 {% endblock %}
 
 {% block main %}
-
-<a href="/delete/{{novel.name}}/0"><button class="btn btn-primary">DELETE NOVEL</button></a>
-  <form action="/profile/{{novel.name}}/update" method="post">
+<a href="/profile/{{novel.name}}/add-chapter"><button class="btn btn-primary">Add chapter</button></a>
+<a href="/delete/{{novel.name}}/0"><button class="btn btn-danger">DELETE NOVEL</button></a>
+<form action="/profile/{{novel.name}}/update" method="post">
   <label for="novel-name">Novel name: </label>
     <input name="new_name" id="novel-name" type="text" value="{{novel.name}}" />
     <button type="submit">Submit</button>
-  </form>
+</form>
   <h2>Chapters</h2>
   {% for chapter in chapters%}
     <div>

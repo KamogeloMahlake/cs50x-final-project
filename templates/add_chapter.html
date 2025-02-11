@@ -1,0 +1,14 @@
+{% extends "layout.html"%}
+
+{% block title%}
+  {{name}}: Add Chapter
+{% endblock %}
+
+{% block main%}
+<form action="/profile/{{name}}/add-chapter" method="post">
+  <div><input name="chapter_num" type="number" placeholder="Chapter Num"/></div>
+  <div><input name="title" type="text" placeholder="Chapter Title" /></div>
+  <div><input name="content" type="text" placeholder="Chapter Content" /></div>
+  <button type="submit">Submit</button>
+</form>
+{% endblock%}
