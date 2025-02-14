@@ -76,3 +76,15 @@ p
 {
   font-size: 1rem
 }
+
+button
+{
+  margin: 10px
+}
+
+textarea
+{
+  min-height: 3rem;
+  width: 100%;
+  field-sizing: content;
+}

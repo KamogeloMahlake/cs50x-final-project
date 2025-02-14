@@ -8,10 +8,10 @@
 
 {% block main %}
 
-    <h1 class="text-center">{{name}}</h1>
-    <h2 class="text-center">{{chapter.title}}</h2>
+    <h1 >{{name}}</h1>
+    <h2 >{{chapter.title}}</h2>
     <div class="d-flex flex-column justify-content-center ">
-      <div class="center">
+      <div>
       {% if previous%}
        <a href="/{{name}}/chapter-{{previous[0].chapter_num}}"><button class="btn btn-primary"><<<<<<</button></a>
       {% endif%}
@@ -21,8 +21,8 @@
       {% endif%}
       </div>
     
-      <div class="center">{{ chapter.content | safe}}</div>
-      <div class="center">
+      <div style="text-align: start">{{ chapter.content | safe}}</div>
+      <div>
       {% if previous%}
       <a href="/{{name}}/chapter-{{previous[0].chapter_num}}"><button class="btn btn-primary"><<<<<<</button></a>
       {% endif%}
@@ -33,18 +33,18 @@
 
       </div>
     </div>
-    
-    <div class="center">
+    <hr> 
+    <div style="margin: 15px auto">
       <form action="/comments" method="post">
         <div><textarea name="comment" placeholder="comment" class="form-control"/></textarea></div>
         <div><input hidden name="type" value="chapter"></div>
         <div><input hidden name="link" value="/{{name}}/chapter-{{chapter.chapter_num}}" /></div>
         <div><input hidden name="id" id="id" value="{{chapter.chapter_id}}" /></div>
-        <button class="btn btn-primary">Submit</button>
+        <button  class="btn btn-primary">Submit</button>
       </form>
     </div>
 
-    <div id="comments">
+    <div id="comments" class="list-group">
     </div>
           
 {% endblock %}
@@ -64,7 +64,15 @@
         return
       }
       data.forEach(comment => {
-        html += `<p>${comment.comment}</p>`
+        html += `
+            <div class="list-group-item list-group-item-action">
+              <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">${comment.username}</h5>
+                <small>${comment.date}</small>
+              </div>
+              <p class="mb-1">${comment.comment}</p>
+            </div>
+        `
       })
       comments.innerHTML = html;
 

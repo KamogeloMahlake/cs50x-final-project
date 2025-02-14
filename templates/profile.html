@@ -5,9 +5,9 @@
 {% endblock %}
 
 {% block main %}
-    <div>
+    <div class="align-baseline">
       <a href="/create">
-        <button class="btn">Create New Novel</button>
+        <button class="btn btn-primary">Create New Novel</button>
       </a>
     </div>
 
@@ -26,22 +26,12 @@
 		<p>{{user.date}}</p>
             </li>
         </ul>
-
-        <ul  class="list-group list-group-flush">
-            
-            <li class="list-group-item">
-                <p>Comments</p>
-                <p><a href="">Last comments</a></p>
-            </li>
-            
-            <li class="list-group-item">
-                <p>Novels</p>
-            </li>
-        
-        </ul>
     </div>
-    <button class="novels-button">All novels</button>
-    <div class="hidden" id="novels">
+    <div>
+      <h2 style="margin-top: 25px">User novels</h2>
+      <button class="novels-button btn btn-primary" style="margin: 25px">All novels</button>
+      <ul class="hidden list-group list-group-flush" id="novels">
+      </ul>
     </div>
 
 {% endblock %}

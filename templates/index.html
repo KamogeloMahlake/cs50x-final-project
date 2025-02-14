@@ -1,19 +1,19 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Home
+  {{x}}
 {% endblock %}
 
 
 {% block main %}
-    <div class="d-flex flex-row flex-wrap ">
-		{% for novel in novels%}
-			<div class="p-2 novel-index">
-				<a href="/novel/{{novel.name}}">
-          <img src="{{novel.image}}" class="img-responsive item-img lazy"/>
-          <div class="novel-title"><h3>{{novel.name}}</h3></div>
-        </a>
-			</div>
-		{% endfor %}
-    </div>
+<div class="d-flex flex-row flex-wrap ">
+{% for novel in novels%}
+	<div class="p-2 novel-index">
+		<a href="/novel/{{novel.name}}">
+      <img src="{{novel.image}}" class="img-responsive item-img lazy"/>
+      <div class="novel-title"><h3>{{novel.name}}</h3></div>
+    </a>
+	</div>
+{% endfor %}
+</div>
 {% endblock %}

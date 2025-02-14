@@ -8,15 +8,20 @@
 <a href="/profile/{{novel.name}}/add-chapter"><button class="btn btn-primary">Add chapter</button></a>
 <a href="/delete/{{novel.name}}/0"><button class="btn btn-danger">DELETE NOVEL</button></a>
 <form action="/profile/{{novel.name}}/update" method="post">
-  <label for="novel-name">Novel name: </label>
+  <div class="mb-3">
     <input name="new_name" id="novel-name" type="text" value="{{novel.name}}" />
-    <button type="submit">Submit</button>
+  </div>
+    <button class="btn btn-primary" type="submit">Rename</button>
 </form>
   <h2>Chapters</h2>
   {% for chapter in chapters%}
-    <div>
-      <a href="/{{novel.name}}/chapter-{{chapter.chapter_num}}">{{chapter.title}}</a>
-      <a href="/profile/{{novel.name}}/update/chapter-{{chapter.chapter_num}}"><button>UPDATE</button></a>
+    <div class="container">
+      <div class="row">
+      {{chapter.chapter_num}}. <a class="col-5" href="/{{novel.name}}/chapter-{{chapter.chapter_num}}">{{chapter.title}}</a>
+      <a class="col-6" href="/profile/{{novel.name}}/update/chapter-{{chapter.chapter_num}}"><button class="btn btn-primary">UPDATE</button></a>
+      </div>
+      <hr>
+
     </div>
   {% endfor %}
 {% endblock %}

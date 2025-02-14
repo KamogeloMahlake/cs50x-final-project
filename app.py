@@ -1,8 +1,21 @@
 from flask import redirect, render_template, request, session, jsonify, flash
-from helpers import apology, login_required, get_novel_data, get_chapter_data, test_email, test_password
+from helpers import (
+    apology,
+    login_required,
+    get_novel_data,
+    get_chapter_data,
+    test_email,
+    test_password,
+    string_to_html,
+    allowed_file,
+)
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
 from config import app, db
+import os
+from werkzeug.utils import secure_filename
+
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
 
 
 @app.after_request
@@ -12,10 +25,12 @@ def after_request(response):
     response.headers["Pragma"] = "no-cache"
     return response
 
+
 @app.route("/")
 def index():
     novels = get_novel_data(db)
-    return render_template("index.html", novels=novels)
+    return render_template("index.html", novels=novels, x="Home")
+
 
 @app.route("/novel/<name>")
 def novel(name):
@@ -24,27 +39,39 @@ def novel(name):
 
     return render_template("novel.html", chapters=chapters, novel=novel)
 
+
 @app.route("/<name>/chapter-<int:num>")
 def chapter(name, num):
     novel_id = get_novel_data(db, name=name)[0]["novel_id"]
     chapter = get_chapter_data(db, novel_id=novel_id, chapter_num=num)[0]
-    previous = get_chapter_data(db, novel_id=novel_id, chapter_num=(num-1))
-    next_chapter = get_chapter_data(db, novel_id=novel_id, chapter_num=num+1)
+    previous = get_chapter_data(db, novel_id=novel_id, chapter_num=(num - 1))
+    next_chapter = get_chapter_data(db, novel_id=novel_id, chapter_num=num + 1)
 
-    return render_template("chapter.html", chapter=chapter, name=name, previous=previous, next_chapter=next_chapter)
+    return render_template(
+        "chapter.html",
+        chapter=chapter,
+        name=name,
+        previous=previous,
+        next_chapter=next_chapter,
+    )
+
 
 @app.route("/search", methods=["GET", "POST"])
 def search():
     if request.method == "POST":
         q = request.form.get("q")
-        novels = db.execute("SELECT name FROM novels WHERE name LIKE ? ORDER BY name", "%" + q + "%")
+        novels = db.execute(
+            "SELECT * FROM novels WHERE name LIKE ? ORDER BY name", "%" + q + "%"
+        )
 
         if novels:
-            return render_template("search.html", novels=novels)
+            return render_template("index.html", novels=novels, x="Search")
 
         return apology("novel not found", 404)
     q = request.args.get("q")
-    novels = db.execute("SELECT name FROM novels WHERE name LIKE ? ORDER BY name", "%" + q + "%")
+    novels = db.execute(
+        "SELECT * FROM novels WHERE name LIKE ? ORDER BY name", "%" + q + "%"
+    )
     return jsonify(novels)
 
 
@@ -96,6 +123,7 @@ def logout():
     # Redirect user to login form
     return redirect("/")
 
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
     """Register user"""
@@ -108,16 +136,24 @@ def register():
         if not username:
             return apology("must provide username", 400)
         elif not password or not test_password(password):
-            return apology("must contain uppercase and lowercase, digits, special character and have a minimum length of 8", 400)
+            return apology(
+                "must contain uppercase and lowercase, digits, special character and have a minimum length of 8",
+                400,
+            )
         elif not confirmation or confirmation != password:
             return apology("password must be the same", 400)
         elif not email or not test_email(email):
             flash("Provide valid email")
             return redirect("/register")
-            #return apology("provide vaild email", 403)
+            # return apology("provide vaild email", 403)
         try:
             session["user_id"] = db.execute(
-                "INSERT INTO users(username, password, email, date) VALUES(?, ?, ?, ?)", username, generate_password_hash(password), email, datetime.today().strftime("%d %B %Y %H:%M"))
+                "INSERT INTO users(username, password, email, date) VALUES(?, ?, ?, ?)",
+                username,
+                generate_password_hash(password),
+                email,
+                datetime.today().strftime("%d %B %Y %H:%M"),
+            )
 
         except ValueError:
             return apology("user already exists, try login", 400)
@@ -126,16 +162,35 @@ def register():
     else:
         return render_template("register.html")
 
-@app.route('/create', methods=["GET", "POST"])
+
+@app.route("/create", methods=["GET", "POST"])
 @login_required
 def create():
     if request.method == "POST":
         novel_name = request.form.get("name")
         about = request.form.get("about")
-        author = db.execute("SELECT username FROM users WHERE user_id = ?", session["user_id"])
+        if "image" not in request.files:
+            flash("No file part")
+            return redirect(request.url)
+
+        file = request.files["image"]
+        if file.filename == "":
+            flash("No selected file")
+            return redirect(request.url)
 
         try:
-            db.execute("INSERT INTO novels(name, about, author, user_id) VALUES(?, ?, ?, ?)", novel_name, about, author, session["user_id"])
+            if about and novel_name and file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+                db.execute(
+                    "INSERT INTO novels(name, about, user_id, image) VALUES(?, ?, ?)",
+                    novel_name,
+                    string_to_html(about),
+                    session["user_id"],
+                    filename,
+                )
+            else:
+                return apology("missing fields")
         except ValueError:
             return apology("novel already exists")
 
@@ -144,7 +199,7 @@ def create():
         return render_template("create.html")
 
 
-@app.route('/profile/<name>/add-chapter', methods=["GET", "POST"])
+@app.route("/profile/<name>/add-chapter", methods=["GET", "POST"])
 @login_required
 def add_chapter(name):
     try:
@@ -159,22 +214,30 @@ def add_chapter(name):
 
             try:
                 chapter_num = int(chapter_num)
-                db.execute("INSERT INTO chapters(content, title, chapter_num, novel_id) VALUES(?, ?, ?, ?)", content, title, chapter_num, novel["novel_id"])
+                db.execute(
+                    "INSERT INTO chapters(content, title, chapter_num, novel_id) VALUES(?, ?, ?, ?)",
+                    string_to_html(content),
+                    title,
+                    chapter_num,
+                    novel["novel_id"],
+                )
                 return redirect(f"/profile/{name}/update")
             except ValueError:
                 return apology("provide a number or chapter already exist")
-        else: 
+        else:
             return render_template("add_chapter.html", name=name)
     except IndexError:
         return apology("access denied")
 
-@app.route('/profile/')
+
+@app.route("/profile/")
 @login_required
 def profile():
     user = db.execute("SELECT * FROM users WHERE user_id = ?", session["user_id"])[0]
     return render_template("profile.html", user=user)
 
-@app.route('/comments', methods=["GET", "POST"])
+
+@app.route("/comments", methods=["GET", "POST"])
 @login_required
 def comment():
 
@@ -186,42 +249,71 @@ def comment():
         link = request.form.get("link")
 
         if comment and comment_type == "novel":
-            db.execute("INSERT INTO comments(comment, novel_id, date, user_id) VALUES(?, ?, ?, ?)", comment, int(id), date, session["user_id"])
+            db.execute(
+                "INSERT INTO comments(comment, novel_id, date, user_id) VALUES(?, ?, ?, ?)",
+                string_to_html(comment),
+                int(id),
+                date,
+                session["user_id"],
+            )
         elif comment and comment_type == "chapter":
-            db.execute("INSERT INTO comments(comment, chapter_id, date, user_id) VALUES(?, ?, ?, ?)", comment, int(id), date, session["user_id"])
-        
+            db.execute(
+                "INSERT INTO comments(comment, chapter_id, date, user_id) VALUES(?, ?, ?, ?)",
+                comment,
+                int(id),
+                date,
+                session["user_id"],
+            )
+
         return redirect(link)
-            
+
     user = request.args.get("user")
     novel = request.args.get("novel")
     chapter = request.args.get("chapter")
     try:
+        data = []
         if user:
-            return jsonify(db.execute("SELECT * FROM comments WHERE user_id = ?", int(user)))
+            data = db.execute("SELECT * FROM comments WHERE user_id = ?", int(user))
         elif novel:
-            return jsonify(db.execute("SELECT * FROM comments WHERE novel_id = ?", int(novel)))
+            data = db.execute("SELECT * FROM comments WHERE novel_id = ?", int(novel))
         elif chapter:
-            return jsonify(db.execute("SELECT * FROM comments WHERE chapter_id = ?", int(chapter)))
-        return 
+            data = db.execute(
+                "SELECT * FROM comments WHERE chapter_id = ?", int(chapter)
+            )
+
+        for i in data:
+            i["username"] = db.execute(
+                "SELECT username FROM users WHERE user_id = ?", i["user_id"]
+            )[0]["username"]
+
+        return jsonify(data)
     except ValueError:
         return []
 
-@app.route('/profile/novels')
+
+@app.route("/profile/novels")
 @login_required
 def user_novels():
     novels = get_novel_data(db, user_id=session["user_id"])
     return jsonify(novels)
 
-@app.route('/profile/<name>/update', methods=["GET", "POST"])
+
+@app.route("/profile/<name>/update", methods=["GET", "POST"])
 @login_required
 def update(name):
     try:
         novel = get_novel_data(db, name=name, user_id=session["user_id"])[0]
-        
+
         if request.method == "POST":
             new_name = request.form.get("new_name")
             if new_name:
-                db.execute("UPDATE novels SET name = ? WHERE name = ? AND user_id = ? AND novel_id = ?", new_name, name, session["user_id"], novel["novel_id"])
+                db.execute(
+                    "UPDATE novels SET name = ? WHERE name = ? AND user_id = ? AND novel_id = ?",
+                    new_name,
+                    name,
+                    session["user_id"],
+                    novel["novel_id"],
+                )
                 return redirect("/profile")
 
             return apology("provide valid name")
@@ -231,6 +323,7 @@ def update(name):
             return render_template("update.html", chapters=chapters, novel=novel)
     except IndexError:
         return apology("access denied")
+
 
 @app.route("/profile/<name>/update/chapter-<int:chapter_num>", methods=["GET", "POST"])
 @login_required
@@ -246,29 +339,51 @@ def update_chapter(name, chapter_num):
                 return apology("provide info to all fields")
 
             try:
-                db.execute("UPDATE chapters SET title = ?, chapter_num = ?, content = ? WHERE novel_id = ? AND chapter_num = ?", title, new_chapter_num, content, novel["novel_id"], chapter_num)
+                db.execute(
+                    "UPDATE chapters SET title = ?, chapter_num = ?, content = ? WHERE novel_id = ? AND chapter_num = ?",
+                    title,
+                    new_chapter_num,
+                    string_to_html(content),
+                    novel["novel_id"],
+                    chapter_num,
+                )
 
             except ValueError:
                 return apology("chapter number already exists")
+            return redirect(f"profile/{name}/update")
         else:
-            chapter = get_chapter_data(db, chapter_num=chapter_num, novel_id=novel["novel_id"])[0]
+            chapter = get_chapter_data(
+                db, chapter_num=chapter_num, novel_id=novel["novel_id"]
+            )[0]
             return render_template("update_chapter.html", chapter=chapter, name=name)
     except IndexError:
         return apology("access denied")
 
-@app.route('/delete/<name>/<int:chapter_num>')
+
+@app.route("/delete/<name>/<int:chapter_num>")
 @login_required
 def delete(name, chapter_num=0):
     try:
         novel = get_novel_data(db, name=name, user_id=session["user_id"])[0]
         if chapter_num > 0:
-            db.execute("DELETE FROM chapters WHERE chapter_num = ? AND novel_id = ?", chapter_num, novel["novel_id"])
+            db.execute(
+                "DELETE FROM chapters WHERE chapter_num = ? AND novel_id = ?",
+                chapter_num,
+                novel["novel_id"],
+            )
 
             return redirect(f"/profile/{name}/update")
         else:
             db.execute("DELETE FROM chapters WHERE novel_id = ?", novel["novel_id"])
-            db.execute("DELETE FROM novels WHERE novel_id = ? AND name = ?", novel["novel_id"], name)
+            db.execute(
+                "DELETE FROM novels WHERE novel_id = ? AND name = ?",
+                novel["novel_id"],
+                name,
+            )
 
             return redirect("/profile")
     except IndexError:
         return apology("you have no access to this novel")
+
+
+app.run(debug=True)

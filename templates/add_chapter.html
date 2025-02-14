@@ -6,9 +6,9 @@
 
 {% block main%}
 <form action="/profile/{{name}}/add-chapter" method="post">
-  <div><input name="chapter_num" type="number" placeholder="Chapter Num"/></div>
-  <div><input name="title" type="text" placeholder="Chapter Title" /></div>
-  <div><input name="content" type="text" placeholder="Chapter Content" /></div>
-  <button type="submit">Submit</button>
+  <div class="mb-3"><input class="form-control" name="chapter_num" type="number" placeholder="Chapter Num"/></div>
+  <div class="mb-3"><input class="form-control" name="title" type="text" placeholder="Chapter Title" /></div>
+  <div class="mb-3"><textarea class="form-control" name="content" placeholder="Chapter Content" ></textarea></div>
+  <button class="btn btn-primary" type="submit">Submit</button>
 </form>
 {% endblock%}

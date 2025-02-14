@@ -20,7 +20,7 @@
 </div>
 
 
-<button class="btn" id="button">Comment</button>
+<button class="btn btn-primary" id="button">Comments</button>
 <hr>
 <div id="chapters">
     {% for chapter in chapters%}
@@ -39,9 +39,9 @@
     <div><input name="id" id="id" hidden value="{{novel.novel_id}}" /></div>
     <button class="btn btn-primary">Submit</button>
   </form>
-  <button id="show" class="btn">Show comments</button>
-  <ul id="displaycomments" class="hidden">
-  </ul>
+  <button id="show" class="btn btn-primary">Show comments</button>
+  <div id="displaycomments" class="hidden list-group">
+  </div>
 </div>
 {% endblock %}
 
@@ -53,21 +53,32 @@
     const displayComments = document.getElementById("displaycomments");
     const show = document.getElementById("show");
     const novelId = document.getElementById("id");
-
+    let viewed = false;
     button.addEventListener("click", () => {
       chapters.classList.toggle("hidden");
       comments.classList.toggle("hidden");
+      button.textContent = button.textContent === "Comments" ? "Chapters" : "Comments"
     });
 
     show.addEventListener("click", async () => {
+      if (show.textContent === "Show comments" && !viewed)
+      {
       let response = await fetch(`/comments?novel=${novelId.value}`);
       let data = await response.json();
 
       let html = `` 
       data.forEach(comment => {
-        html += `<li>${comment.comment}</li>`
+        html += `<div class="list-group-item list-group-item-action">
+                  <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">${comment.username}</h5>
+                    <small>${comment.date}</small>
+                  </div>
+                  <p class="mb-1">${comment.comment}</p>
+                </div>`
       });
       displayComments.innerHTML = html;
+      viewed = true;
+      }
       displayComments.classList.toggle("hidden");
       show.textContent = show.textContent === "Show comments" ? "Close comments" : "Show comments";
     })

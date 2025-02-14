@@ -1,19 +1,1 @@
-{% extends "layout.html" %}
-{% block title %}
-Search
-{% endblock %}
 
-{% block main %}
-
-    {% if novels %}
-        <ul>
-            {% for novel in novels %}
-                <li>
-			                <a href="/novel/{{novel.name}}">
-                        	{{novel.name}}
-                    	</a>
-                </li>    
-            {% endfor %}
-	      </ul>
-    {% endif %}
-{% endblock %}

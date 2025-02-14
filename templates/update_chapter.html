@@ -5,11 +5,17 @@ Update Chapter
 {% endblock %}
 
 {% block main%}
-  <a href="/delete/{{name}}/{{chapter.chapter_num}}"><button class="btn btn-primary">DELETE</button>
+<a style="margin: 20px" href="/delete/{{name}}/{{chapter.chapter_num}}"><button class="btn btn-danger">DELETE</button></a>
   <form action="/profile/{{name}}/update/chapter-{{chapter.chapter_num}}" method="post">
-    <div><input name="title" type="text" value="{{chapter.title}}" /></div>
-    <div><input name="chapter_num" type="text" value="{{chapter.chapter_num}}"/></div>
-    <div><input name="content" type="text" value="{{chapter.content}}" /></div>
+    <div class="mb-3">
+      <label for="title">Title: </label>
+      <input id="title" class="form-control" name="title" type="text" value="{{chapter.title}}" /></div>
+    <div class="mb-3">
+      <label for="num">Chapter Number: </label>
+      <input id="num" class="form-control" name="chapter_num" type="text" value="{{chapter.chapter_num}}"/></div>
+    <div class="mb-3">
+      <label for="content">Content: </label>
+      <textarea id="content" name="content" class="form-control">{{chapter.content}}</textarea></div>
     <button class="btn btn-primary" type="submit">UPDATE</button>
-  </form>     
+  </form>
 {% endblock%}

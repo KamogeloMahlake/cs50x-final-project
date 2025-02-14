@@ -16,16 +16,18 @@ novelsButton.addEventListener("click", async () => {
 		let html = "";
 
 		novels.forEach(novel => {
-			html += `<div>
-                <p>
+			html += `<li class="list-group-item container">
+                <div class="row">
+                <h6 class="col-6">
 					        <a href="/novel/${novel.name}">${novel.name}</a>
-				        </p>
-                <a href="/profile/${novel.name}/update">
-                  <button>Update</button>
+				        </h6>
+                <a class="col-6" href="/profile/${novel.name}/update">
+                  <button class="btn btn-primary">Update</button>
                 </a>
-              </div>`;
+                </div>
+              </li>`;
 		})
-		novel.innerHTML += html;
+		novel.innerHTML = html;
 		showNovel = true;
 	}
 	userDetails.classList.toggle('hidden');
