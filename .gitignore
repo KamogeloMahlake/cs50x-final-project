@@ -1,0 +1,7 @@
+copy.db
+databases/
+flask_session/
+__pycache__
+novel.db 
+novels.db 
+

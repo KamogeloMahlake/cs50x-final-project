@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash
 
 keyword = input("Search: ").replace(" ", "+")
 
-db = SQL("sqlite:///database.db")
+db = SQL("sqlite:///databases/database1.db")
 
 r = requests.get(f"https://novelbin.me/search?keyword={keyword}")
 
@@ -65,7 +65,12 @@ while next_chapter["href"] is not None:
     soup = BeautifulSoup(page.text, "html.parser")
 
     content = soup.find("div", id="chr-content")
-    title = soup.find("a", class_="chr-title")["title"]
+    try:
+        title = soup.find("a", class_="chr-title")["title"]
+    except TypeError:
+        title = soup.find("h2").getText()
+
+    print(title)
     chapter_num += 1
 
     if content and title and chapter_num and novel_id:

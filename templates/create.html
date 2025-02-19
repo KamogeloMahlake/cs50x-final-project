@@ -5,7 +5,7 @@ Create new novel
 {% endblock %}
 
 {% block main %}
-  <form action="/create" method="post">
+  <form action="/create" method="POST">
     <div class="mb-3">
       <input class="form-control" autocomplete="off" autofocus name="name" placeholder="Novel Name" type="text" />
     </div>
@@ -14,7 +14,7 @@ Create new novel
       <textarea class="form-control" autocomplete="off" name="about" placeholder="About"></textarea>
     </div>
     <div class="mb-3">
-      <input class="form-control" type="file" name="image" />
+      <input class="form-control" type="text" name="image" placeholder="image url" />
     </div>
     
     <button class="btn btn-primary">Submit</button>

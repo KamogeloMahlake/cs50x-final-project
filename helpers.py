@@ -1,8 +1,9 @@
 from flask import redirect, render_template, session
 from functools import wraps
 from re import match
+from cs50 import SQL
 
-ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
+ALLOWED_EXTENSIONS = ["png", "jpg", "jpeg", "gif"]
 
 
 def apology(message, code=400):
@@ -61,16 +62,18 @@ def get_novel_data(database, name="", user_id=""):
         return database.execute("SELECT * FROM novels ORDER BY name")
 
 
-def get_chapter_data(database, novel_id="", chapter_num=""):
+def get_chapter_data(name, novel_id="", chapter_num=""):
+    database = SQL(f"sqlite:///databases/{name.replace(' ', '_')}.db")
+    print(chapter_num, novel_id)
     if novel_id and chapter_num:
         return database.execute(
-            "SELECT * FROM chapters WHERE novel_id = ? AND chapter_num = ?",
+            "SELECT * FROM chapter WHERE novel_id = ? AND chapter_num = ?",
             novel_id,
             chapter_num,
         )
     elif novel_id:
         return database.execute(
-            "SELECT * FROM chapters WHERE novel_id = ? ORDER BY chapter_num", novel_id
+            "SELECT * FROM chapter WHERE novel_id = ? ORDER BY chapter_num", novel_id
         )
 
 
@@ -99,4 +102,11 @@ def string_to_html(text):
 
 
 def allowed_file(filename):
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+    try:
+        name, ext = filename.split(".")
+
+        if ext in ALLOWED_EXTENSIONS and name:
+            return True
+        return False
+    except Exception:
+        return False
